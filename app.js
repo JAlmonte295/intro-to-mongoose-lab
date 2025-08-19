@@ -9,16 +9,16 @@ const User = require('./models/user');
 
 function displayWelcomeMessage() {
     console.log('====================================');
-    console.log('  Welcome to the Mongoose Lab App!  ');
+    console.log('  Welcome to the Customer Relationship Management App!  ');
     console.log('====================================\n');
 }
 
 function displayMenu() {
     console.log('\n--- Main Menu ---');
-    console.log('1. Create a user');
-    console.log('2. View all users');
-    console.log('3. Update a user');
-    console.log('4. Delete a user');
+    console.log('1. Create a customer');
+    console.log('2. View all customers');
+    console.log('3. Update a customer');
+    console.log('4. Delete a customer');
     console.log('5. Quit');
     console.log('------------------');
     console.log('\n');
@@ -33,20 +33,20 @@ async function main() {
         const choice = prompt('Enter the number of your choice: ');
         switch (choice) {
             case '1':
-                await createUser();
+                await createCustomer();
                 break;
             case '2':
-                await viewAllUsers();
+                await viewAllCustomers();
                 break;
             case '3':
-                await updateUser();
+                await updateCustomer();
                 break;
             case '4':
-                await deleteUser();
+                await deleteCustomer();
                 break;
             case '5':
                 console.log('\nExiting application. Goodbye!');
-                await mongoose.disconnect();
+                await mongoose.connection.close();
                 return;
             default:
                 console.log('\nInvalid choice. Please enter a number between 1 and 5.');
@@ -55,65 +55,65 @@ async function main() {
     }
 }
 
-//CREATE USER
-async function createUser() {
-    console.log('\n--- Create a New User ---');
-    const name = prompt('Enter user name: ');
-    const email = prompt('Enter user email: ');
+//CREATE CUSTOMER
+async function createCustomer() {
+    console.log('\n--- Create a New Customer ---');
+    const name = prompt('Enter customer name: ');
+    const email = prompt('Enter customer email: ');
 
     try {
-        const newUser = new User({ name, email });
-        await newUser.save();
-        console.log(`\nUser "${name}" created successfully!`);
+        const newCustomer = new User({ name, email });
+        await newCustomer.save();
+        console.log(`\nCustomer "${name}" created successfully!`);
     } catch (error) {
         if (error.code === 11000) { // Duplicate key error for email
-            console.error('\nError: A user with that email already exists.');
+            console.error('\nError: A customer with that email already exists.');
         } else {
-            console.error('\nAn error occurred while creating the user:', error.message);
+            console.error('\nAn error occurred while creating the customer:', error.message);
         }
     }
 }
 
-//VIEW ALL CREATED USERS
-async function viewAllUsers() {
-    console.log('\n--- View All Users ---');
+//VIEW ALL CREATED CUSTOMERS
+async function viewAllCustomers() {
+    console.log('\n--- View All Customers ---');
     try {
-        const users = await User.find();
-        if (users.length === 0) {
-            console.log('\nNo users found.');
+        const customers = await User.find();
+        if (customers.length === 0) {
+            console.log('\nNo customers found.');
         } else {
-            console.log('\nAll Users:');
-            users.forEach((user, index) => {
-                console.log(`${index + 1}. Name: ${user.name}, Email: ${user.email}, ID: ${user._id}`);
+            console.log('\nAll Customers:');
+            customers.forEach((customer, index) => {
+                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
             });
         }
         } catch (error) {
-        console.error('\nAn error occurred while fetching users:', error.message);
+        console.error('\nAn error occurred while fetching customers:', error.message);
     }
 };
 
-//UPDATE USER
+//UPDATE CUSTOMER
 
-async function updateUser() {
-    console.log('\n--- Update a User ---');
-    console.log('\n--- Current Users ---');
+async function updateCustomer() {
+    console.log('\n--- Update a Customer ---');
+    console.log('\n--- Current Customers ---');
     try {
-        const users = await User.find();
-        if (users.length === 0) {
-            console.log('\nNo users found.');
+        const customers = await User.find();
+        if (customers.length === 0) {
+            console.log('\nNo customers found.');
         } else {
-            users.forEach((user, index) => {
-                console.log(`${index + 1}. Name: ${user.name}, Email: ${user.email}, ID: ${user._id}`);
+            customers.forEach((customer, index) => {
+                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
             });
         }
         } catch (error) {
-        console.error('\nAn error occurred while fetching users:', error.message);
+        console.error('\nAn error occurred while fetching customers:', error.message);
     }
 
-    const userId = prompt('\nCopy and paste the user ID you wish to update: ');
+    const userId = prompt('\nCopy and paste the customer ID you wish to update: ');
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        console.log('\nInvalid user ID format.');
+        console.log('\nInvalid customer ID format.');
         return;
     }
 
@@ -134,63 +134,61 @@ async function updateUser() {
     }
 
     try {
-        const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+        const updatedCustomer = await User.findByIdAndUpdate(userId, updateFields, { new: true });
 
-        if (!updatedUser) {
-            console.log('\nUser not found.');
+        if (!updatedCustomer) {
+            console.log('\nCustomer not found.');
         } else {
-            console.log(`\nUser "${updatedUser.name}" updated successfully!`);
+            console.log(`\nCustomer "${updatedCustomer.name}" updated successfully!`);
         }
     } catch (error) {
         if (error.code === 11000) {
-            console.error('\nError: A user with that email already exists.');
+            console.error('\nError: A customer with that email already exists.');
         } else {
-            console.error('\nAn error occurred while updating the user:', error.message);
+            console.error('\nAn error occurred while updating the customer:', error.message);
         }
     }
 }
 
-//DELETE USER
+//DELETE CUSTOMER
 
-async function deleteUser() {
-    console.log ('\n--- Delete a User ---');
-    console.log('\n--- Current Users ---');
+async function deleteCustomer() {
+    console.log ('\n--- Delete a Customer ---');
+    console.log('\n--- Current Customers ---');
     try {
-        const users = await User.find();
-        if (users.length === 0) {
-            console.log('\nNo users to delete.');
+        const customers = await User.find();
+        if (customers.length === 0) {
+            console.log('\nNo customers to delete.');
             return;
         } else {
-            users.forEach((user, index) => {
-                console.log(`${index + 1}. Name: ${user.name}, Email: ${user.email}, ID: ${user._id}`);
+            customers.forEach((customer, index) => {
+                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
             });
         }
     } catch (error) {
-        console.error('\nAn error occurred while fetching users:', error.message);
+        console.error('\nAn error occurred while fetching customers:', error.message);
     }
 
 
-    const userId = prompt('\nEnter the user ID to delete: ');
+    const userId = prompt('\nEnter the customer ID to delete: ');
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
-        console.log('\nInvalid user ID format.');
+        console.log('\nInvalid customer ID format.');
         return;
     }
 
     try {
-        const deletedUser = await User.findByIdAndDelete(userId);
+        const deletedCustomer = await User.findByIdAndDelete(userId);
 
-        if (!deletedUser) {
-            console.log('\nUser not found.');
+        if (!deletedCustomer) {
+            console.log('\nCustomer not found.');
         } else {
-            console.log(`\nUser "${deletedUser.name}" deleted successfully!`);
+            console.log(`\nCustomer "${deletedCustomer.name}" deleted successfully!`);
         }
     } catch (error) {
-        console.error('\nAn error occurred while deleting the user:', error.message);
+        console.error('\nAn error occurred while deleting the customer:', error.message);
     }
 };
-
-
 
 
 main();
