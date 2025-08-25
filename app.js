@@ -55,6 +55,34 @@ async function main() {
     }
 }
 
+// Helper function to display and retrieve customers
+async function displayAndGetCustomers(options = {}) {
+    const {
+        listHeader,
+        noCustomersMessage = '\nNo customers found.'
+    } = options;
+
+    try {
+        const customers = await User.find();
+        if (customers.length === 0) {
+            console.log(noCustomersMessage);
+            return [];
+        }
+
+        if (listHeader) {
+            console.log(listHeader);
+        }
+        customers.forEach((customer, index) => {
+            console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
+        });
+
+        return customers;
+    } catch (error) {
+        console.error('\nAn error occurred while fetching customers:', error.message);
+        return [];
+    }
+}
+
 //CREATE CUSTOMER
 async function createCustomer() {
     console.log('\n--- Create a New Customer ---');
@@ -77,37 +105,17 @@ async function createCustomer() {
 //VIEW ALL CREATED CUSTOMERS
 async function viewAllCustomers() {
     console.log('\n--- View All Customers ---');
-    try {
-        const customers = await User.find();
-        if (customers.length === 0) {
-            console.log('\nNo customers found.');
-        } else {
-            console.log('\nAll Customers:');
-            customers.forEach((customer, index) => {
-                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
-            });
-        }
-        } catch (error) {
-        console.error('\nAn error occurred while fetching customers:', error.message);
-    }
+    await displayAndGetCustomers({ listHeader: '\nAll Customers:' });
 };
 
 //UPDATE CUSTOMER
 
 async function updateCustomer() {
     console.log('\n--- Update a Customer ---');
-    console.log('\n--- Current Customers ---');
-    try {
-        const customers = await User.find();
-        if (customers.length === 0) {
-            console.log('\nNo customers found.');
-        } else {
-            customers.forEach((customer, index) => {
-                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
-            });
-        }
-        } catch (error) {
-        console.error('\nAn error occurred while fetching customers:', error.message);
+    const customers = await displayAndGetCustomers({ listHeader: '\n--- Current Customers ---' });
+
+    if (customers.length === 0) {
+        return;
     }
 
     const userId = prompt('\nCopy and paste the customer ID you wish to update: ');
@@ -154,21 +162,14 @@ async function updateCustomer() {
 
 async function deleteCustomer() {
     console.log ('\n--- Delete a Customer ---');
-    console.log('\n--- Current Customers ---');
-    try {
-        const customers = await User.find();
-        if (customers.length === 0) {
-            console.log('\nNo customers to delete.');
-            return;
-        } else {
-            customers.forEach((customer, index) => {
-                console.log(`${index + 1}. Name: ${customer.name}, Email: ${customer.email}, ID: ${customer._id}`);
-            });
-        }
-    } catch (error) {
-        console.error('\nAn error occurred while fetching customers:', error.message);
-    }
+    const customers = await displayAndGetCustomers({
+        listHeader: '\n--- Current Customers ---',
+        noCustomersMessage: '\nNo customers to delete.'
+    });
 
+    if (customers.length === 0) {
+        return;
+    }
 
     const userId = prompt('\nEnter the customer ID to delete: ');
 
